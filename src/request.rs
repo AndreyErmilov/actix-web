@@ -134,6 +134,12 @@ impl HttpRequest {
         self.head().extensions_mut()
     }
 
+    /// Resource's name
+    #[inline]
+    pub fn resource_name(&self) -> &str {
+        "name"
+    }
+
     /// Generate url for named resource
     ///
     /// ```rust
@@ -385,6 +391,19 @@ mod tests {
     fn test_request_query() {
         let req = TestRequest::with_uri("/?id=test").to_http_request();
         assert_eq!(req.query_string(), "id=test");
+    }
+
+    #[test]
+    fn test_request_resource_name() {
+        let mut res = ResourceDef::new("/test/");
+        *res.name_mut() = "index".to_string();
+
+        let mut rmap = ResourceMap::new(ResourceDef::new(""));
+        rmap.add(&mut res, None);
+        let req = TestRequest::with_uri("/test/")
+            .rmap(rmap)
+            .to_http_request();
+        assert_eq!(req.resource_name(), "name");
     }
 
     #[test]
